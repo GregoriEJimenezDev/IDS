@@ -211,6 +211,7 @@ body{background:var(--bg-base);color:var(--body-text);font-family:var(--font-dis
   </div>
 </div>
 
+<script src="./pensumData.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════
 // DATA — Pensum Oficial ITLA · Tecnología en Desarrollo de Software
@@ -226,7 +227,7 @@ body{background:var(--bg-base);color:var(--body-text);font-family:var(--font-dis
 // CRÉDITOS 0: Materias de idiomas e introductorias tienen 0 créditos
 //   oficiales pero se contabilizan para el progreso de completado.
 // ════════════════════════════════════════════════════════════
-const PENSUM = Object.freeze([
+const PENSUM = Object.freeze(window.PENSUM_OFICIAL || [
 
   // ── PERÍODO 1 — Total: 24 créditos ───────────────────────
   { id:"MAT-001", nombre:"Precálculo",                          creditos:5, periodo:1, prereqs:[], cero:false },
@@ -237,57 +238,56 @@ const PENSUM = Object.freeze([
   { id:"CBG-110", nombre:"Ética 1",                             creditos:3, periodo:1, prereqs:[], cero:false },
   { id:"TDS-001", nombre:"Introducción a la elaboración de Algoritmos", creditos:4, periodo:1, prereqs:[], cero:false },
   { id:"OAI-001", nombre:"Orientación Institucional",           creditos:1, periodo:1, prereqs:[], cero:false },
-  { id:"CBG-010", nombre:"Educación Constitucional",            creditos:0, periodo:1, prereqs:[], cero:true  },
 
   // ── PERÍODO 2 — Total: 23 créditos ───────────────────────
-  { id:"TDS-002", nombre:"Fundamentos de programación",         creditos:4, periodo:2, prereqs:["TDS-001"], cero:false },
+  { id:"TDS-002", nombre:"Fundamentos de programaci??n",         creditos:4, periodo:2, prereqs:["TI-101","TDS-001"], cero:false },
   { id:"MAT-101", nombre:"Cálculo Diferencial",                 creditos:5, periodo:2, prereqs:["MAT-001"], cero:false },
   { id:"TDS-101", nombre:"Introducción a las bases de Datos",   creditos:4, periodo:2, prereqs:["TDS-001"], cero:false },
   { id:"HIS-102", nombre:"Historia Dominicana",                 creditos:3, periodo:2, prereqs:["HIS-101"], cero:false },
   { id:"ING-002", nombre:"Inglés Nivel 4-6",                    creditos:0, periodo:2, prereqs:["ING-001"], cero:true  },
-  { id:"TI-115",  nombre:"Contabilidad Financiera",             creditos:4, periodo:2, prereqs:[], cero:false },
+  { id:"TI-115",  nombre:"Contabilidad Financiera",             creditos:4, periodo:2, prereqs:["MAT-001"], cero:false, errorMensaje:"Debes aprobar Pre-c?lculo (MAT-001) primero" },
   { id:"CBG-115", nombre:"Ética 2",                             creditos:3, periodo:2, prereqs:["CBG-110"], cero:false },
 
   // ── PERÍODO 3 — Total: 24 créditos ───────────────────────
   { id:"CBG-210", nombre:"Probabilidad y Estadística",          creditos:3, periodo:3, prereqs:["MAT-101"], cero:false },
   { id:"FIS-110", nombre:"Fisica General",                      creditos:4, periodo:3, prereqs:["MAT-101"], cero:false },
-  { id:"FIS-110-L",nombre:"Laboratorio Fisica General",         creditos:1, periodo:3, prereqs:["FIS-110"], cero:false },
+  { id:"FIS-110-L",nombre:"Laboratorio Fisica General",         creditos:1, periodo:3, prereqs:["MAT-101"], coReqs:["FIS-110"], cero:false },
   { id:"ING-003", nombre:"Inglés Nivel 7-9",                    creditos:0, periodo:3, prereqs:["ING-002"], cero:true  },
-  { id:"TDS-003", nombre:"Programación I",                      creditos:4, periodo:3, prereqs:["TDS-002"], cero:false },
-  { id:"TDS-004", nombre:"Análisis y Diseño de Sistemas",       creditos:4, periodo:3, prereqs:["TDS-002","TDS-101"], cero:false },
+  { id:"TDS-003", nombre:"Programaci??n I",                      creditos:4, periodo:3, prereqs:["TDS-002","TDS-101"], cero:false },
+  { id:"TDS-004", nombre:"An??lisis y Dise??o de Sistemas",       creditos:4, periodo:3, prereqs:["TDS-002"], cero:false },
   { id:"MAT-102", nombre:"Cálculo Integral",                    creditos:5, periodo:3, prereqs:["MAT-101"], cero:false },
   { id:"CBG-120", nombre:"Ética 3",                             creditos:3, periodo:3, prereqs:["CBG-115"], cero:false },
 
   // ── PERÍODO 4 — Total: 19 créditos ───────────────────────
-  { id:"TDS-005", nombre:"Diseño Centrado en el usuario",       creditos:4, periodo:4, prereqs:["TDS-004"], cero:false },
-  { id:"TDS-102", nombre:"Base de Datos Avanzada",              creditos:4, periodo:4, prereqs:["TDS-101"], cero:false },
-  { id:"TDS-006", nombre:"Programación II",                     creditos:4, periodo:4, prereqs:["TDS-003"], cero:false },
-  { id:"TDS-201", nombre:"Inteligencia Artificial",             creditos:4, periodo:4, prereqs:["TDS-003","CBG-210"], cero:false },
+  { id:"TDS-005", nombre:"Dise??o Centrado en el usuario",       creditos:4, periodo:4, prereqs:["TDS-003","TDS-004"], cero:false },
+  { id:"TDS-102", nombre:"Base de Datos Avanzada",              creditos:4, periodo:4, prereqs:["TDS-101","TDS-002"], cero:false },
+  { id:"TDS-006", nombre:"Programaci??n II",                     creditos:4, periodo:4, prereqs:["TDS-003","TDS-004"], cero:false },
+  { id:"TDS-201", nombre:"Inteligencia Artificial",             creditos:4, periodo:4, prereqs:["TDS-003","TDS-004","CBG-210"], cero:false },
   { id:"ING-004", nombre:"Inglés Nivel 10-12",                  creditos:0, periodo:4, prereqs:["ING-003"], cero:true  },
   { id:"CBG-215", nombre:"Metodología de investigación",        creditos:3, periodo:4, prereqs:["CBG-210"], cero:false },
 
   // ── PERÍODO 5 — Total: 24 créditos ───────────────────────
-  { id:"TME-001",  nombre:"Fundamentos de Electrónica",         creditos:4, periodo:5, prereqs:["FIS-110"], cero:false },
-  { id:"TME-001-L",nombre:"Laboratorio Fundamentos de Electrónica", creditos:1, periodo:5, prereqs:["TME-001"], cero:false },
+  { id:"TME-001",  nombre:"Fundamentos de Electr??nica",         creditos:4, periodo:5, prereqs:["MAT-001"], cero:false },
+  { id:"TME-001-L",nombre:"Laboratorio Fundamentos de Electr??nica", creditos:1, periodo:5, prereqs:["MAT-001"], coReqs:["TME-001"], cero:false },
   { id:"TDS-301", nombre:"Auditoría Informática",               creditos:4, periodo:5, prereqs:["TDS-102","TDS-006"], cero:false },
-  { id:"TDS-007", nombre:"Programación III",                    creditos:4, periodo:5, prereqs:["TDS-006"], cero:false },
-  { id:"TDS-103", nombre:"Minería de Datos e Inteligencia de Negocios", creditos:4, periodo:5, prereqs:["TDS-102","TDS-201"], cero:false },
-  { id:"TDS-008", nombre:"Programación Web",                    creditos:4, periodo:5, prereqs:["TDS-006"], cero:false },
-  { id:"TDS-015", nombre:"Electiva 1",                          creditos:3, periodo:5, prereqs:[], cero:false },
+  { id:"TDS-007", nombre:"Programaci??n III",                    creditos:4, periodo:5, prereqs:["TDS-005","TDS-006","TDS-102"], cero:false },
+  { id:"TDS-103", nombre:"Miner??a de Datos e Inteligencia de Negocios", creditos:4, periodo:5, prereqs:["TDS-102","TDS-006"], cero:false },
+  { id:"TDS-008", nombre:"Programaci??n Web",                    creditos:4, periodo:5, prereqs:["TDS-102","TDS-003"], cero:false },
+  { id:"TDS-015", nombre:"Electiva 1",                          creditos:3, periodo:5, prereqs:[], esElectiva:true, errorMensaje:"Debes completar todo el 2do cuatrimestre para desbloquear esta electiva", cero:false },
 
   // ── PERÍODO 6 — Total: 18 créditos ───────────────────────
-  { id:"TDS-016", nombre:"Electiva 2",                          creditos:3, periodo:6, prereqs:["TDS-015"], cero:false },
+  { id:"TDS-016", nombre:"Electiva 2",                          creditos:3, periodo:6, prereqs:["TDS-015"], esElectiva:true, errorMensaje:"Debes completar todo el 2do cuatrimestre para desbloquear esta electiva", cero:false },
   { id:"ING-110", nombre:"Inglés Técnico",                      creditos:4, periodo:6, prereqs:["ING-004"], cero:false },
-  { id:"TDS-009", nombre:"Programación Paralela",               creditos:4, periodo:6, prereqs:["TDS-007"], cero:false },
-  { id:"TDS-303", nombre:"Introducción a la ingeniería de software", creditos:4, periodo:6, prereqs:["TDS-007","TDS-008"], cero:false },
-  { id:"ADM-110", nombre:"Desarrollo de Emprendedores",         creditos:3, periodo:6, prereqs:[], cero:false },
+  { id:"TDS-009", nombre:"Programaci??n Paralela",               creditos:4, periodo:6, prereqs:["TDS-102","TDS-006"], cero:false },
+  { id:"TDS-303", nombre:"Introducci??n a la ingenier??a de software", creditos:4, periodo:6, prereqs:["TDS-007","TDS-103","TDS-301"], cero:false },
+  { id:"ADM-110", nombre:"Desarrollo de Emprendedores",         creditos:3, periodo:6, prereqs:["CBG-215"], cero:false, errorMensaje:"Debes aprobar Metodolog?a de la Investigaci?n primero" },
   { id:"DEP-101", nombre:"Educación Física",                    creditos:0, periodo:6, prereqs:[], cero:true  },
 
   // ── PERÍODO 7 — Total: 18 créditos ───────────────────────
   { id:"TDS-010", nombre:"Estructura de Datos",                 creditos:4, periodo:7, prereqs:["TDS-007"], cero:false },
-  { id:"TDS-302", nombre:"Administración de Proyectos de Software", creditos:4, periodo:7, prereqs:["TDS-303"], cero:false },
-  { id:"TDS-011", nombre:"Introducción al desarrollo de aplicaciones móviles", creditos:4, periodo:7, prereqs:["TDS-008"], cero:false },
-  { id:"TDS-601", nombre:"Proyecto Final TDS",                  creditos:3, periodo:7, prereqs:["TDS-302","TDS-010"], cero:false },
+  { id:"TDS-302", nombre:"Administraci??n de Proyectos de Software", creditos:4, periodo:7, prereqs:["TDS-007"], cero:false },
+  { id:"TDS-011", nombre:"Introducci??n al desarrollo de aplicaciones m??viles", creditos:4, periodo:7, prereqs:["TDS-007"], cero:false },
+  { id:"TDS-601", nombre:"Proyecto Final TDS",                  creditos:3, periodo:7, prereqs:["TDS-009","TDS-303"], cero:false },
   { id:"ADM-111", nombre:"Plan de Negocios",                    creditos:3, periodo:7, prereqs:["ADM-110"], cero:false },
 ]);
 
@@ -296,6 +296,48 @@ const TOTAL_MATERIAS  = PENSUM.length;
 const TOTAL_CREDITOS  = PENSUM.reduce((s,m) => s + m.creditos, 0);
 const PERIODOS        = [...new Set(PENSUM.map(m=>m.periodo))].sort((a,b)=>a-b);
 const PENSUM_MAP      = new Map(PENSUM.map(m=>[m.id,m]));
+const SEGUNDO_PERIODO_COMPLETO = Object.freeze(["HIS-102","MAT-101","TI-115","ING-002","TDS-002","CBG-115","TDS-101"]);
+
+function faltantesPorPrerequisitos(m, aprobadosSet){
+  return (m.prereqs||[]).filter(pid=>!aprobadosSet.has(pid));
+}
+
+function faltantesReglaElectiva(m, aprobadosSet){
+  if(!m.esElectiva) return [];
+  return SEGUNDO_PERIODO_COMPLETO.filter(pid=>!aprobadosSet.has(pid));
+}
+
+function obtenerMensajeBloqueo(m, aprobadosSet){
+  const faltantesBase = faltantesPorPrerequisitos(m, aprobadosSet);
+  if(faltantesBase.length>0) return m.errorMensaje || `Debes aprobar primero: ${faltantesBase.join(', ')}`;
+
+  const faltantesElectiva = faltantesReglaElectiva(m, aprobadosSet);
+  if(faltantesElectiva.length>0) return m.errorMensaje || 'Debes completar todo el 2do cuatrimestre para desbloquear esta materia';
+
+  return '';
+}
+
+function puedeAprobar(materiaCodigo, aprobadosSetParam){
+  const aprobadosSet = aprobadosSetParam ?? new Set(Object.keys(appState));
+  const materia = PENSUM_MAP.get(materiaCodigo);
+  if(!materia) return false;
+  return obtenerMensajeBloqueo(materia, aprobadosSet) === "";
+}
+
+function getConfigMateriasConBloqueo(){
+  const aprobadosSet = new Set(Object.keys(appState));
+  return PENSUM.map(m=>({
+    codigo: m.id,
+    nombre: m.nombre,
+    prerrequisitos: [...(m.prereqs||[])],
+    corequisitos: [...(m.coReqs||[])],
+    bloqueada: !puedeAprobar(m.id, aprobadosSet) && !aprobadosSet.has(m.id),
+    error_mensaje: obtenerMensajeBloqueo(m, aprobadosSet)
+  }));
+}
+
+window.puedeAprobar = puedeAprobar;
+window.getConfigMateriasConBloqueo = getConfigMateriasConBloqueo;
 
 // ════════════════════════════════════════════════
 // LOGIC
@@ -324,7 +366,7 @@ function reiniciarEstado(){ appState={}; guardarEstado(); }
 
 function calcularEstadoMateria(m, aprobadosSet){
   if(aprobadosSet.has(m.id)) return ESTADO.APROBADA;
-  return m.prereqs.every(pid=>aprobadosSet.has(pid)) ? ESTADO.DISPONIBLE : ESTADO.BLOQUEADA;
+  return puedeAprobar(m.id, aprobadosSet) ? ESTADO.DISPONIBLE : ESTADO.BLOQUEADA;
 }
 
 function calcularPensumCompleto(){
@@ -376,7 +418,7 @@ function aprobarMateria(id,nota){
   const pp   = calcularPensumCompleto();
   const item = pp.get(id);
   if(!item) throw new Error(`Materia "${id}" no existe.`);
-  if(item.estado===ESTADO.BLOQUEADA) throw new Error('Completa los prerrequisitos primero.');
+  if(item.estado===ESTADO.BLOQUEADA) throw new Error(obtenerMensajeBloqueo(item.materia, new Set(Object.keys(appState))) || 'Completa los prerrequisitos primero.');
   appState = {...appState,[id]:{nota}};
   guardarEstado();
 }
