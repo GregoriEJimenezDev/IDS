@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ITLA – Gestión Académica | TDS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg-base:#0d0f14;--bg-surface:#141720;--bg-card:#1a1e2b;--bg-card-hover:#1f2435;--bg-modal:#151921;
+  --accent:#00e5b0;--accent-dim:rgba(0,229,176,.12);--accent-glow:rgba(0,229,176,.3);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,.12);
+  --danger:#ff4d6d;--danger-dim:rgba(255,77,109,.12);
+  --muted:#3a4060;--muted-text:#5a6080;--body-text:#c8d0e8;--heading-text:#eef1fa;
+  --font-display:'Syne',sans-serif;--font-mono:'Space Mono',monospace;
+  --radius-sm:6px;--radius-md:12px;--radius-lg:18px;
+  --shadow-card:0 4px 24px rgba(0,0,0,.4);--shadow-glow:0 0 20px var(--accent-glow);
+  --transition:200ms cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg-base);color:var(--body-text);font-family:var(--font-display);min-height:100vh;overflow-x:hidden;}
+.app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:1rem 2rem;background:rgba(13,15,20,.85);border-bottom:1px solid rgba(0,229,176,.15);backdrop-filter:blur(12px);}
+.header-brand{display:flex;align-items:center;gap:1rem;}
+.brand-logo{font-family:var(--font-mono);font-size:1.4rem;font-weight:700;letter-spacing:.05em;}
+.logo-itla{color:var(--accent)}.logo-dot{color:var(--muted-text);margin:0 2px}.logo-sw{color:var(--heading-text)}
+.brand-meta h1{font-size:.95rem;font-weight:700;color:var(--heading-text);letter-spacing:.04em;text-transform:uppercase;}
+.brand-meta p{font-size:.72rem;color:var(--muted-text);font-family:var(--font-mono);}
+.header-stats{display:flex;gap:.75rem;flex-wrap:wrap;}
+.stat-pill{display:flex;flex-direction:column;align-items:center;padding:.5rem 1rem;background:var(--bg-card);border:1px solid var(--muted);border-radius:var(--radius-sm);min-width:72px;}
+.stat-pill.accent{border-color:var(--accent);background:var(--accent-dim);}
+.stat-num{font-family:var(--font-mono);font-size:1.2rem;font-weight:700;color:var(--heading-text);line-height:1;}
+.stat-pill.accent .stat-num{color:var(--accent);}
+.stat-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-text);margin-top:2px;}
+.app-main{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 65px);}
+.sidebar{background:var(--bg-surface);border-right:1px solid rgba(255,255,255,.05);padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:1.75rem;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
+.sidebar-title{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-text);margin-bottom:.85rem;font-family:var(--font-mono);}
+.progress-ring-wrap{position:relative;width:120px;margin:0 auto;}
+.progress-ring{width:100%;transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--muted);stroke-width:8;}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease;filter:drop-shadow(0 0 6px var(--accent-glow));}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);}
+.ring-label span{font-size:1.3rem;font-weight:700;color:var(--accent);}
+.ring-label small{font-size:.6rem;color:var(--muted-text);}
+.indice-list{display:flex;flex-direction:column;gap:.5rem;}
+.indice-row{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;padding:.4rem .6rem;background:var(--bg-card);border-radius:var(--radius-sm);border-left:2px solid var(--muted);}
+.indice-row.has-data{border-left-color:var(--accent);}
+.indice-row .cuatri-label{color:var(--muted-text);font-family:var(--font-mono);}
+.indice-row .cuatri-val{color:var(--accent);font-family:var(--font-mono);font-weight:700;}
+.legend{list-style:none;display:flex;flex-direction:column;gap:.5rem;font-size:.78rem;}
+.legend li{display:flex;align-items:center;gap:.5rem;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-dot.approved{background:var(--accent);}
+.legend-dot.available{background:var(--amber);}
+.legend-dot.locked{background:var(--muted);}
+.btn-reset{width:100%;padding:.65rem;background:var(--danger-dim);border:1px solid var(--danger);border-radius:var(--radius-sm);color:var(--danger);font-family:var(--font-mono);font-size:.78rem;cursor:pointer;transition:all var(--transition);letter-spacing:.04em;}
+.btn-reset:hover{background:var(--danger);color:#fff;}
+.pensum-section{padding:1.5rem;overflow-x:auto;}
+.cuatrimestre-scroll{display:flex;gap:1.25rem;min-width:max-content;padding-bottom:1rem;}
+.cuatri-col{display:flex;flex-direction:column;gap:.75rem;width:220px;flex-shrink:0;}
+.cuatri-header{display:flex;flex-direction:column;gap:2px;padding:.6rem .75rem;background:var(--bg-card);border-radius:var(--radius-sm);border-top:3px solid var(--accent);}
+.cuatri-num{font-family:var(--font-mono);font-size:.6rem;color:var(--muted-text);text-transform:uppercase;letter-spacing:.1em;}
+.cuatri-name{font-size:.8rem;font-weight:700;color:var(--heading-text);}
+.cuatri-credits{font-family:var(--font-mono);font-size:.65rem;color:var(--accent);}
+.subject-card{background:var(--bg-card);border:1px solid var(--muted);border-radius:var(--radius-md);padding:.85rem;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;}
+.subject-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--muted);transition:background var(--transition);}
+.subject-card:hover{background:var(--bg-card-hover);transform:translateY(-1px);}
+.subject-card.approved{border-color:rgba(0,229,176,.3);}
+.subject-card.approved::before{background:var(--accent);}
+.subject-card.available{border-color:rgba(245,166,35,.3);}
+.subject-card.available::before{background:var(--amber);}
+.subject-card.locked{opacity:.45;cursor:not-allowed;}
+.subject-card.locked:hover{transform:none;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.4rem;margin-bottom:.4rem;}
+.card-clave{font-family:var(--font-mono);font-size:.58rem;color:var(--muted-text);flex-shrink:0;padding:.15rem .35rem;background:rgba(255,255,255,.04);border-radius:3px;}
+.card-grade{font-family:var(--font-mono);font-size:.85rem;font-weight:700;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);background:var(--accent-dim);color:var(--accent);flex-shrink:0;}
+.card-status-icon{font-size:.75rem;opacity:.6;flex-shrink:0;}
+.card-name{font-size:.78rem;font-weight:600;color:var(--heading-text);line-height:1.3;margin-bottom:.45rem;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;}
+.card-credits{font-family:var(--font-mono);font-size:.62rem;color:var(--muted-text);}
+.zero-credit{font-family:var(--font-mono);font-size:.55rem;color:var(--muted-text);opacity:.6;padding:.1rem .3rem;border:1px solid var(--muted);border-radius:3px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity var(--transition);}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+.modal-card{background:var(--bg-modal);border:1px solid rgba(0,229,176,.2);border-radius:var(--radius-lg);padding:2rem;width:min(520px,92vw);position:relative;transform:translateY(16px) scale(.97);transition:transform var(--transition);box-shadow:var(--shadow-card),0 0 40px rgba(0,229,176,.08);}
+.modal-overlay.active .modal-card{transform:translateY(0) scale(1);}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--bg-card);border:1px solid var(--muted);border-radius:var(--radius-sm);color:var(--muted-text);width:30px;height:30px;cursor:pointer;font-size:.8rem;transition:all var(--transition);}
+.modal-close:hover{color:var(--danger);border-color:var(--danger);}
+.modal-header{margin-bottom:1.25rem;}
+.modal-clave{font-family:var(--font-mono);font-size:.7rem;color:var(--accent);margin-bottom:.3rem;letter-spacing:.06em;}
+.modal-header h3{font-size:1.1rem;font-weight:700;color:var(--heading-text);margin-bottom:.5rem;}
+.modal-meta{display:flex;gap:.5rem;flex-wrap:wrap;}
+.badge{font-family:var(--font-mono);font-size:.65rem;padding:.2rem .55rem;background:var(--bg-card);border:1px solid var(--muted);border-radius:99px;color:var(--muted-text);}
+.badge.zero{border-color:var(--muted);color:var(--muted-text);opacity:.6;}
+.modal-body{display:flex;flex-direction:column;gap:1.25rem;}
+.modal-prereqs h4,.modal-grade-section h4{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-text);margin-bottom:.6rem;font-family:var(--font-mono);}
+.prereq-tag{display:inline-block;font-size:.7rem;padding:.2rem .5rem;border-radius:var(--radius-sm);margin:.2rem;font-family:var(--font-mono);}
+.prereq-tag.met{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(0,229,176,.2);}
+.prereq-tag.unmet{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(255,77,109,.2);}
+.prereq-tag.none{color:var(--muted-text);font-style:italic;}
+.grade-selector{display:flex;gap:.6rem;margin-bottom:1rem;}
+.grade-btn{flex:1;padding:.75rem;background:var(--bg-card);border:2px solid var(--muted);border-radius:var(--radius-md);color:var(--body-text);font-family:var(--font-mono);font-size:1rem;font-weight:700;cursor:pointer;transition:all var(--transition);display:flex;flex-direction:column;align-items:center;gap:2px;}
+.grade-btn small{font-size:.6rem;color:var(--muted-text);font-weight:400;}
+.grade-btn:hover,.grade-btn.selected{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.grade-btn.selected small{color:rgba(0,229,176,.6);}
+.modal-actions{display:flex;gap:.6rem;}
+.btn-approve{flex:1;padding:.75rem;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#0d0f14;font-family:var(--font-display);font-size:.85rem;font-weight:700;cursor:pointer;transition:all var(--transition);}
+.btn-approve:hover{background:#00ffcc;box-shadow:var(--shadow-glow);}
+.btn-remove{padding:.75rem 1rem;background:var(--danger-dim);border:1px solid var(--danger);border-radius:var(--radius-sm);color:var(--danger);font-family:var(--font-display);font-size:.85rem;font-weight:700;cursor:pointer;transition:all var(--transition);}
+.btn-remove:hover{background:var(--danger);color:#fff;}
+.modal-error{font-size:.75rem;color:var(--danger);font-family:var(--font-mono);min-height:1em;margin-top:.3rem;}
+.zero-notice{font-size:.72rem;color:var(--muted-text);font-family:var(--font-mono);background:var(--bg-card);border:1px solid var(--muted);border-radius:var(--radius-sm);padding:.6rem .8rem;line-height:1.5;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg-base);}
+::-webkit-scrollbar-thumb{background:var(--muted);border-radius:99px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.subject-card{animation:fadeIn .3s ease backwards;}
+@media(max-width:900px){
+  .app-main{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;gap:1rem;border-right:none;border-bottom:1px solid rgba(255,255,255,.05);}
+  .sidebar-section{min-width:160px;}
+  .progress-ring-wrap{width:80px;}
+}
+@media(max-width:600px){
+  .app-header{flex-direction:column;align-items:flex-start;}
+  .header-stats{width:100%;justify-content:space-between;}
+  .stat-pill{flex:1;}
+  .pensum-section{padding:1rem .75rem;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-logo"><span class="logo-itla">ITLA</span><span class="logo-dot">·</span><span class="logo-sw">TDS</span></div>
+    <div class="brand-meta"><h1>Gestión Académica</h1><p>Tecnología en Desarrollo de Software — Plan Oficial</p></div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill"><span class="stat-num" id="count-aprobadas">0</span><span class="stat-label">Aprobadas</span></div>
+    <div class="stat-pill"><span class="stat-num" id="count-creditos">0</span><span class="stat-label">Créditos</span></div>
+    <div class="stat-pill accent"><span class="stat-num" id="count-indice">0.00</span><span class="stat-label">Índice Ac.</span></div>
+  </div>
+</header>
+
+<main class="app-main">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h2 class="sidebar-title">Resumen</h2>
+      <div class="progress-ring-wrap">
+        <svg class="progress-ring" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+        </svg>
+        <div class="ring-label"><span id="ring-pct">0%</span><small>completado</small></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h2 class="sidebar-title">Índice por Período</h2>
+      <div id="indice-cuatrimestral" class="indice-list"></div>
+    </div>
+    <div class="sidebar-section">
+      <h2 class="sidebar-title">Leyenda</h2>
+      <ul class="legend">
+        <li><span class="legend-dot approved"></span> Aprobada</li>
+        <li><span class="legend-dot available"></span> Disponible</li>
+        <li><span class="legend-dot locked"></span> Bloqueada</li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <button class="btn-reset" id="btn-reset">↺ Reiniciar Progreso</button>
+    </div>
+  </aside>
+
+  <section class="pensum-section">
+    <div class="cuatrimestre-scroll" id="pensum-container"></div>
+  </section>
+</main>
+
+<div class="modal-overlay" id="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+    <div class="modal-header">
+      <div class="modal-clave" id="modal-clave">TDS-001</div>
+      <h3 id="modal-title">Nombre Materia</h3>
+      <div class="modal-meta">
+        <span id="modal-creditos" class="badge">0 créditos</span>
+        <span id="modal-cuatrimestre" class="badge">Período 0</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-prereqs">
+        <h4>Prerrequisitos</h4>
+        <div id="modal-prereq-list"></div>
+      </div>
+      <div id="modal-grade-section" class="modal-grade-section">
+        <h4>Registrar Nota</h4>
+        <div class="grade-selector">
+          <button class="grade-btn" data-grade="A">A <small>(4.0)</small></button>
+          <button class="grade-btn" data-grade="B">B <small>(3.0)</small></button>
+          <button class="grade-btn" data-grade="C">C <small>(2.0)</small></button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-approve" id="btn-approve">✓ Registrar como Aprobada</button>
+          <button class="btn-remove" id="btn-remove" style="display:none">✗ Eliminar Nota</button>
+        </div>
+        <p class="modal-error" id="modal-error"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// DATA — Pensum Oficial ITLA · Tecnología en Desarrollo de Software
+// Fuente: Imágenes del plan de estudios oficial (7 períodos)
+//
+// NOTA SOBRE PRERREQUISITOS:
+//   El pensum oficial ITLA no publica explícitamente la lista de
+//   prerrequisitos. Se han inferido las dependencias académicas
+//   naturales basadas en la progresión lógica de cada área:
+//   programación → programación avanzada, inglés niveles, etc.
+//   Ajusta el array prereqs[] según el reglamento actualizado.
+//
+// CRÉDITOS 0: Materias de idiomas e introductorias tienen 0 créditos
+//   oficiales pero se contabilizan para el progreso de completado.
+// ════════════════════════════════════════════════════════════
+const PENSUM = Object.freeze([
+
+  // ── PERÍODO 1 — Total: 24 créditos ───────────────────────
+  { id:"MAT-001", nombre:"Precálculo",                          creditos:5, periodo:1, prereqs:[], cero:false },
+  { id:"TI-101",  nombre:"Fundamentos del Computador",          creditos:4, periodo:1, prereqs:[], cero:false },
+  { id:"ING-001", nombre:"Inglés Nivel 1-3",                    creditos:0, periodo:1, prereqs:[], cero:true  },
+  { id:"HIS-101", nombre:"Historia Universal",                  creditos:3, periodo:1, prereqs:[], cero:false },
+  { id:"ESP-101", nombre:"Redacción Castellana",                creditos:4, periodo:1, prereqs:[], cero:false },
+  { id:"CBG-110", nombre:"Ética 1",                             creditos:3, periodo:1, prereqs:[], cero:false },
+  { id:"TDS-001", nombre:"Introducción a la elaboración de Algoritmos", creditos:4, periodo:1, prereqs:[], cero:false },
+  { id:"OAI-001", nombre:"Orientación Institucional",           creditos:1, periodo:1, prereqs:[], cero:false },
+  { id:"CBG-010", nombre:"Educación Constitucional",            creditos:0, periodo:1, prereqs:[], cero:true  },
+
+  // ── PERÍODO 2 — Total: 23 créditos ───────────────────────
+  { id:"TDS-002", nombre:"Fundamentos de programación",         creditos:4, periodo:2, prereqs:["TDS-001"], cero:false },
+  { id:"MAT-101", nombre:"Cálculo Diferencial",                 creditos:5, periodo:2, prereqs:["MAT-001"], cero:false },
+  { id:"TDS-101", nombre:"Introducción a las bases de Datos",   creditos:4, periodo:2, prereqs:["TDS-001"], cero:false },
+  { id:"HIS-102", nombre:"Historia Dominicana",                 creditos:3, periodo:2, prereqs:["HIS-101"], cero:false },
+  { id:"ING-002", nombre:"Inglés Nivel 4-6",                    creditos:0, periodo:2, prereqs:["ING-001"], cero:true  },
+  { id:"TI-115",  nombre:"Contabilidad Financiera",             creditos:4, periodo:2, prereqs:[], cero:false },
+  { id:"CBG-115", nombre:"Ética 2",                             creditos:3, periodo:2, prereqs:["CBG-110"], cero:false },
+
+  // ── PERÍODO 3 — Total: 24 créditos ───────────────────────
+  { id:"CBG-210", nombre:"Probabilidad y Estadística",          creditos:3, periodo:3, prereqs:["MAT-101"], cero:false },
+  { id:"FIS-110", nombre:"Fisica General",                      creditos:4, periodo:3, prereqs:["MAT-101"], cero:false },
+  { id:"FIS-110-L",nombre:"Laboratorio Fisica General",         creditos:1, periodo:3, prereqs:["FIS-110"], cero:false },
+  { id:"ING-003", nombre:"Inglés Nivel 7-9",                    creditos:0, periodo:3, prereqs:["ING-002"], cero:true  },
+  { id:"TDS-003", nombre:"Programación I",                      creditos:4, periodo:3, prereqs:["TDS-002"], cero:false },
+  { id:"TDS-004", nombre:"Análisis y Diseño de Sistemas",       creditos:4, periodo:3, prereqs:["TDS-002","TDS-101"], cero:false },
+  { id:"MAT-102", nombre:"Cálculo Integral",                    creditos:5, periodo:3, prereqs:["MAT-101"], cero:false },
+  { id:"CBG-120", nombre:"Ética 3",                             creditos:3, periodo:3, prereqs:["CBG-115"], cero:false },
+
+  // ── PERÍODO 4 — Total: 19 créditos ───────────────────────
+  { id:"TDS-005", nombre:"Diseño Centrado en el usuario",       creditos:4, periodo:4, prereqs:["TDS-004"], cero:false },
+  { id:"TDS-102", nombre:"Base de Datos Avanzada",              creditos:4, periodo:4, prereqs:["TDS-101"], cero:false },
+  { id:"TDS-006", nombre:"Programación II",                     creditos:4, periodo:4, prereqs:["TDS-003"], cero:false },
+  { id:"TDS-201", nombre:"Inteligencia Artificial",             creditos:4, periodo:4, prereqs:["TDS-003","CBG-210"], cero:false },
+  { id:"ING-004", nombre:"Inglés Nivel 10-12",                  creditos:0, periodo:4, prereqs:["ING-003"], cero:true  },
+  { id:"CBG-215", nombre:"Metodología de investigación",        creditos:3, periodo:4, prereqs:["CBG-210"], cero:false },
+
+  // ── PERÍODO 5 — Total: 24 créditos ───────────────────────
+  { id:"TME-001",  nombre:"Fundamentos de Electrónica",         creditos:4, periodo:5, prereqs:["FIS-110"], cero:false },
+  { id:"TME-001-L",nombre:"Laboratorio Fundamentos de Electrónica", creditos:1, periodo:5, prereqs:["TME-001"], cero:false },
+  { id:"TDS-301", nombre:"Auditoría Informática",               creditos:4, periodo:5, prereqs:["TDS-102","TDS-006"], cero:false },
+  { id:"TDS-007", nombre:"Programación III",                    creditos:4, periodo:5, prereqs:["TDS-006"], cero:false },
+  { id:"TDS-103", nombre:"Minería de Datos e Inteligencia de Negocios", creditos:4, periodo:5, prereqs:["TDS-102","TDS-201"], cero:false },
+  { id:"TDS-008", nombre:"Programación Web",                    creditos:4, periodo:5, prereqs:["TDS-006"], cero:false },
+  { id:"TDS-015", nombre:"Electiva 1",                          creditos:3, periodo:5, prereqs:[], cero:false },
+
+  // ── PERÍODO 6 — Total: 18 créditos ───────────────────────
+  { id:"TDS-016", nombre:"Electiva 2",                          creditos:3, periodo:6, prereqs:["TDS-015"], cero:false },
+  { id:"ING-110", nombre:"Inglés Técnico",                      creditos:4, periodo:6, prereqs:["ING-004"], cero:false },
+  { id:"TDS-009", nombre:"Programación Paralela",               creditos:4, periodo:6, prereqs:["TDS-007"], cero:false },
+  { id:"TDS-303", nombre:"Introducción a la ingeniería de software", creditos:4, periodo:6, prereqs:["TDS-007","TDS-008"], cero:false },
+  { id:"ADM-110", nombre:"Desarrollo de Emprendedores",         creditos:3, periodo:6, prereqs:[], cero:false },
+  { id:"DEP-101", nombre:"Educación Física",                    creditos:0, periodo:6, prereqs:[], cero:true  },
+
+  // ── PERÍODO 7 — Total: 18 créditos ───────────────────────
+  { id:"TDS-010", nombre:"Estructura de Datos",                 creditos:4, periodo:7, prereqs:["TDS-007"], cero:false },
+  { id:"TDS-302", nombre:"Administración de Proyectos de Software", creditos:4, periodo:7, prereqs:["TDS-303"], cero:false },
+  { id:"TDS-011", nombre:"Introducción al desarrollo de aplicaciones móviles", creditos:4, periodo:7, prereqs:["TDS-008"], cero:false },
+  { id:"TDS-601", nombre:"Proyecto Final TDS",                  creditos:3, periodo:7, prereqs:["TDS-302","TDS-010"], cero:false },
+  { id:"ADM-111", nombre:"Plan de Negocios",                    creditos:3, periodo:7, prereqs:["ADM-110"], cero:false },
+]);
+
+const TOTAL_MATERIAS  = PENSUM.length;
+// Créditos contables (excluye las de 0 crédito para el índice, pero las incluye para el conteo de progreso)
+const TOTAL_CREDITOS  = PENSUM.reduce((s,m) => s + m.creditos, 0);
+const PERIODOS        = [...new Set(PENSUM.map(m=>m.periodo))].sort((a,b)=>a-b);
+const PENSUM_MAP      = new Map(PENSUM.map(m=>[m.id,m]));
+
+// ════════════════════════════════════════════════
+// LOGIC
+// ════════════════════════════════════════════════
+const STORAGE_KEY  = 'itla_tds_progress_v1';
+const ESTADO       = Object.freeze({ APROBADA:'approved', DISPONIBLE:'available', BLOQUEADA:'locked' });
+const GRADE_POINTS = Object.freeze({ A:4.0, B:3.0, C:2.0 });
+const VALID_GRADES = new Set(Object.keys(GRADE_POINTS));
+
+let appState = {};
+
+function cargarEstado(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    appState = Object.entries(parsed).reduce((acc,[id,val])=>{
+      if(PENSUM_MAP.has(id) && val?.nota && VALID_GRADES.has(val.nota)) acc[id]={nota:val.nota};
+      return acc;
+    },{});
+  }catch{ appState={}; }
+}
+
+function guardarEstado(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); }
+function reiniciarEstado(){ appState={}; guardarEstado(); }
+
+function calcularEstadoMateria(m, aprobadosSet){
+  if(aprobadosSet.has(m.id)) return ESTADO.APROBADA;
+  return m.prereqs.every(pid=>aprobadosSet.has(pid)) ? ESTADO.DISPONIBLE : ESTADO.BLOQUEADA;
+}
+
+function calcularPensumCompleto(){
+  const aprobadosSet = new Set(Object.keys(appState));
+  return new Map(PENSUM.map(m=>[m.id,{
+    materia: m,
+    estado:  calcularEstadoMateria(m, aprobadosSet),
+    nota:    appState[m.id]?.nota ?? null
+  }]));
+}
+
+function calcularIndice(items){
+  // Solo materias con créditos > 0 participan en el índice
+  const elegibles = items.filter(({materia}) => materia.creditos > 0);
+  const {pts,cr} = elegibles.reduce(
+    (acc,{materia,nota}) => ({
+      pts: acc.pts + (GRADE_POINTS[nota]??0) * materia.creditos,
+      cr:  acc.cr  + materia.creditos
+    }),{pts:0,cr:0}
+  );
+  return cr===0 ? 0 : +(pts/cr).toFixed(2);
+}
+
+function calcularIndices(){
+  const pp = calcularPensumCompleto();
+  const aprobadas = [...pp.values()].filter(({estado,nota})=>estado===ESTADO.APROBADA && nota!==null);
+
+  const porPeriodo = aprobadas.reduce((acc,item)=>{
+    const p=item.materia.periodo;
+    if(!acc.has(p)) acc.set(p,[]);
+    acc.get(p).push(item);
+    return acc;
+  },new Map());
+
+  return {
+    por_periodo:    new Map([...porPeriodo.entries()].map(([p,items])=>[p,calcularIndice(items)])),
+    acumulado:      calcularIndice(aprobadas),
+    creditos_aprobados: aprobadas.reduce((s,{materia})=>s+materia.creditos,0),
+    total_creditos: TOTAL_CREDITOS,
+    materias_aprobadas: aprobadas.length,
+    total_materias: TOTAL_MATERIAS,
+    // Para el anillo: contamos todas las materias (incluido 0 crédito)
+    pct_materias: aprobadas.length / TOTAL_MATERIAS,
+  };
+}
+
+function aprobarMateria(id,nota){
+  if(!VALID_GRADES.has(nota)) throw new Error(`Nota inválida: "${nota}". Solo A, B o C.`);
+  const pp   = calcularPensumCompleto();
+  const item = pp.get(id);
+  if(!item) throw new Error(`Materia "${id}" no existe.`);
+  if(item.estado===ESTADO.BLOQUEADA) throw new Error('Completa los prerrequisitos primero.');
+  appState = {...appState,[id]:{nota}};
+  guardarEstado();
+}
+
+function eliminarAprobacion(id){
+  const {[id]:_,...resto} = appState;
+  appState = resto;
+  guardarEstado();
+}
+
+// ════════════════════════════════════════════════
+// UI
+// ════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const PC = $('pensum-container');
+const MO = $('modal-overlay');
+
+let activeId      = null;
+let selectedGrade = null;
+
+const PERIODO_LABELS = {
+  1:'Fundamentos',2:'Programación Base',3:'Ciencias y Prog. I',
+  4:'Prog. Avanzada',5:'Especialización I',6:'Especialización II',7:'Proyecto Final'
+};
+const ICON_ESTADO = { approved:'✓', available:'○', locked:'⊘' };
+
+/* ── RENDER (una sola vez) ── */
+function renderPensum(){
+  const frag = document.createDocumentFragment();
+  PERIODOS.forEach(p=>{
+    const materias = [...PENSUM_MAP.values()].filter(m=>m.periodo===p);
+    const totCr = materias.reduce((s,m)=>s+m.creditos,0);
+
+    const col = document.createElement('div');
+    col.className='cuatri-col';
+    col.innerHTML=`<div class="cuatri-header">
+      <span class="cuatri-num">Período ${p}</span>
+      <span class="cuatri-name">${PERIODO_LABELS[p]||'Período '+p}</span>
+      <span class="cuatri-credits">${totCr} créditos</span></div>`;
+
+    materias.forEach((m,i)=>{
+      const card=document.createElement('div');
+      card.className='subject-card';
+      card.dataset.id=m.id;
+      card.style.animationDelay=`${i*35}ms`;
+      col.appendChild(card);
+    });
+    frag.appendChild(col);
+  });
+  PC.appendChild(frag);
+}
+
+/* ── ACTUALIZAR CARDS ── */
+function actualizarCards(pp){
+  pp.forEach(({materia,estado,nota})=>{
+    const card = PC.querySelector(`[data-id="${materia.id}"]`);
+    if(!card) return;
+    const nc = `subject-card ${estado}`;
+    if(card.className!==nc) card.className=nc;
+
+    const gradeOrIcon = nota
+      ? `<span class="card-grade">${nota}</span>`
+      : `<span class="card-status-icon">${ICON_ESTADO[estado]??''}</span>`;
+
+    const creditTag = materia.cero
+      ? `<span class="zero-credit">0 cr.</span>`
+      : `<span class="card-credits">${materia.creditos} cr.</span>`;
+
+    card.innerHTML=`
+      <div class="card-top">
+        <span class="card-clave">${materia.id}</span>
+        ${gradeOrIcon}
+      </div>
+      <div class="card-name">${materia.nombre}</div>
+      <div class="card-footer">${creditTag}</div>`;
+
+    card.style.pointerEvents = estado===ESTADO.BLOQUEADA ? 'none' : 'auto';
+  });
+}
+
+/* ── ACTUALIZAR STATS ── */
+function actualizarStats(idx){
+  $('count-aprobadas').textContent = idx.materias_aprobadas;
+  $('count-creditos').textContent  = idx.creditos_aprobados;
+  $('count-indice').textContent    = idx.acumulado.toFixed(2);
+
+  $('ring-fill').style.strokeDashoffset = 314.16*(1-idx.pct_materias);
+  $('ring-pct').textContent = Math.round(idx.pct_materias*100)+'%';
+
+  $('indice-cuatrimestral').innerHTML = PERIODOS.map(p=>{
+    const v=idx.por_periodo.get(p);
+    return `<div class="indice-row${v!==undefined?' has-data':''}">
+      <span class="cuatri-label">Período ${p}</span>
+      <span class="cuatri-val">${v!==undefined?v.toFixed(2):'—'}</span></div>`;
+  }).join('');
+}
+
+function refresh(){
+  const pp=calcularPensumCompleto();
+  actualizarCards(pp);
+  actualizarStats(calcularIndices());
+}
+
+/* ── MODAL ── */
+function abrirModal(id){
+  const pp  = calcularPensumCompleto();
+  const item= pp.get(id);
+  if(!item || item.estado===ESTADO.BLOQUEADA) return;
+
+  activeId=id; selectedGrade=item.nota??null;
+  $('modal-error').textContent='';
+  $('modal-clave').textContent = item.materia.id;
+  $('modal-title').textContent = item.materia.nombre;
+
+  const crText = item.materia.cero ? '0 créditos (no computable)' : `${item.materia.creditos} créditos`;
+  $('modal-creditos').textContent = crText;
+  $('modal-cuatrimestre').textContent = `Período ${item.materia.periodo}`;
+
+  // Prerrequisitos
+  $('modal-prereq-list').innerHTML = item.materia.prereqs.length===0
+    ? `<span class="prereq-tag none">Sin prerrequisitos</span>`
+    : item.materia.prereqs.map(pid=>{
+        const preq=pp.get(pid);
+        const met=preq?.estado===ESTADO.APROBADA;
+        return `<span class="prereq-tag ${met?'met':'unmet'}">${PENSUM_MAP.get(pid)?.nombre??pid}</span>`;
+      }).join('');
+
+  // Sección de notas
+  const gradeSection = $('modal-grade-section');
+  if(item.materia.cero){
+    // Materias de 0 crédito: solo se marcan como completadas (sin nota de índice)
+    gradeSection.innerHTML=`
+      <h4>Registrar Completada</h4>
+      <div class="zero-notice">Esta materia tiene <strong>0 créditos oficiales</strong> y no afecta el índice académico, pero debes completarla para avanzar.</div>
+      <div class="modal-actions" style="margin-top:.8rem">
+        <button class="btn-approve" id="btn-approve">✓ Marcar como Completada</button>
+        <button class="btn-remove" id="btn-remove" style="display:${item.nota?'block':'none'}">✗ Desmarcar</button>
+      </div>
+      <p class="modal-error" id="modal-error"></p>`;
+
+    document.getElementById('btn-approve').onclick=()=>{
+      try{ aprobarMateria(activeId,'A'); cerrarModal(); refresh(); }
+      catch(err){ document.getElementById('modal-error').textContent=`⚠ ${err.message}`; }
+    };
+    document.getElementById('btn-remove').onclick=()=>{ eliminarAprobacion(activeId); cerrarModal(); refresh(); };
+  } else {
+    gradeSection.innerHTML=`
+      <h4>Registrar Nota</h4>
+      <div class="grade-selector">
+        <button class="grade-btn${selectedGrade==='A'?' selected':''}" data-grade="A">A <small>(4.0)</small></button>
+        <button class="grade-btn${selectedGrade==='B'?' selected':''}" data-grade="B">B <small>(3.0)</small></button>
+        <button class="grade-btn${selectedGrade==='C'?' selected':''}" data-grade="C">C <small>(2.0)</small></button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-approve" id="btn-approve">✓ Registrar como Aprobada</button>
+        <button class="btn-remove" id="btn-remove" style="display:${item.nota?'block':'none'}">✗ Eliminar Nota</button>
+      </div>
+      <p class="modal-error" id="modal-error"></p>`;
+
+    gradeSection.querySelector('.grade-selector').addEventListener('click',e=>{
+      const btn=e.target.closest('.grade-btn');
+      if(!btn) return;
+      selectedGrade=btn.dataset.grade;
+      gradeSection.querySelectorAll('.grade-btn').forEach(b=>b.classList.toggle('selected',b===btn));
+      document.getElementById('modal-error').textContent='';
+    });
+    document.getElementById('btn-approve').onclick=()=>{
+      if(!selectedGrade){ document.getElementById('modal-error').textContent='⚠ Selecciona una nota (A, B o C) primero.'; return; }
+      try{ aprobarMateria(activeId,selectedGrade); cerrarModal(); refresh(); }
+      catch(err){ document.getElementById('modal-error').textContent=`⚠ ${err.message}`; }
+    };
+    document.getElementById('btn-remove').onclick=()=>{ eliminarAprobacion(activeId); cerrarModal(); refresh(); };
+  }
+
+  MO.classList.add('active');
+  MO.setAttribute('aria-hidden','false');
+}
+
+function cerrarModal(){
+  MO.classList.remove('active');
+  MO.setAttribute('aria-hidden','true');
+  activeId=null; selectedGrade=null;
+}
+
+/* ── EVENTS (delegation) ── */
+PC.addEventListener('click',e=>{
+  const card=e.target.closest('.subject-card');
+  if(card) abrirModal(card.dataset.id);
+});
+
+$('modal-close').addEventListener('click',cerrarModal);
+MO.addEventListener('click',e=>{ if(e.target===MO) cerrarModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&MO.classList.contains('active')) cerrarModal(); });
+
+$('btn-reset').addEventListener('click',()=>{
+  if(confirm('¿Seguro que quieres eliminar TODO tu progreso? Esta acción no se puede deshacer.'))
+  { reiniciarEstado(); refresh(); }
+});
+
+/* ── INIT ── */
+cargarEstado();
+renderPensum();
+refresh();
+</script>
+</body>
+</html>
