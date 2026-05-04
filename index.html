@@ -23,8 +23,9 @@ html{scroll-behavior:smooth;}
 body{background:var(--bg-base);color:var(--body-text);font-family:var(--font-display);min-height:100vh;overflow-x:hidden;}
 .app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:1rem 2rem;background:rgba(13,15,20,.85);border-bottom:1px solid rgba(0,229,176,.15);backdrop-filter:blur(12px);}
 .header-brand{display:flex;align-items:center;gap:1rem;}
-.brand-logo{font-family:var(--font-mono);font-size:1.4rem;font-weight:700;letter-spacing:.05em;}
-.logo-itla{color:var(--accent)}.logo-dot{color:var(--muted-text);margin:0 2px}.logo-sw{color:var(--heading-text)}
+.brand-logo{display:flex;align-items:center;gap:.65rem}
+.brand-logo img{width:38px;height:38px;display:block;border-radius:10px;box-shadow:0 0 18px rgba(0,229,176,.22)}
+.logo-word{font-family:var(--font-mono);font-size:1rem;font-weight:700;letter-spacing:.08em;color:var(--heading-text)}
 .brand-meta h1{font-size:.95rem;font-weight:700;color:var(--heading-text);letter-spacing:.04em;text-transform:uppercase;}
 .brand-meta p{font-size:.72rem;color:var(--muted-text);font-family:var(--font-mono);}
 .header-stats{display:flex;gap:.75rem;flex-wrap:wrap;}
@@ -134,7 +135,10 @@ body{background:var(--bg-base);color:var(--body-text);font-family:var(--font-dis
 
 <header class="app-header">
   <div class="header-brand">
-    <div class="brand-logo"><span class="logo-itla">ITLA</span><span class="logo-dot">·</span><span class="logo-sw">TDS</span></div>
+    <div class="brand-logo">
+      <img src="./assets/logo-g.svg" alt="Logo de la aplicación">
+      <span class="logo-word">G·TDS</span>
+    </div>
     <div class="brand-meta"><h1>Gestión Académica</h1><p>Tecnología en Desarrollo de Software — Plan Oficial</p></div>
   </div>
   <div class="header-stats">
